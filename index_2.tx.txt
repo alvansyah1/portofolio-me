@@ -1,0 +1,1358 @@
+<?php
+
+include 'koneksi.php';
+
+$heroCards = mysqli_query($conn,"
+    SELECT * FROM hero_cards
+");
+
+$profile = mysqli_fetch_assoc(
+    mysqli_query($conn,"
+        SELECT * FROM profile LIMIT 1
+    ")
+);
+
+$skills = mysqli_query($conn,"
+    SELECT * FROM skills
+");
+
+$projects = mysqli_query($conn,"
+    SELECT * FROM projects
+    ORDER BY id DESC
+");
+
+$experience = mysqli_query($conn,"
+    SELECT * FROM experience
+    ORDER BY id DESC
+");
+
+if(isset($_POST['send'])){
+
+    $name       = $_POST['name'];
+    $email      = $_POST['email'];
+    $message    = $_POST['message'];
+
+    mysqli_query($conn,"
+        INSERT INTO contacts
+        (name,email,message)
+        VALUES
+        (
+            '$name',
+            '$email',
+            '$message'
+        )
+    ");
+
+    echo "
+    <script>
+        alert('Message Sent Successfully');
+        window.location='index.php#contact';
+    </script>
+    ";
+}
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>
+<?= $profile['name']; ?> | Portfolio
+</title>
+
+<link rel="preconnect"
+href="https://fonts.googleapis.com">
+
+<link
+href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<style>
+
+:root{
+
+    --bg:#050816;
+    --card:rgba(255,255,255,.05);
+    --border:rgba(255,255,255,.08);
+
+    --text:#ffffff;
+    --muted:#94a3b8;
+
+    --gradient:
+    linear-gradient(
+        135deg,
+        #7c3aed,
+        #06b6d4,
+        #ec4899
+    );
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    scroll-behavior:smooth;
+}
+
+body{
+
+    background:var(--bg);
+
+    color:white;
+
+    font-family:'Inter',sans-serif;
+
+    overflow-x:hidden;
+}
+
+/* GRID */
+
+.grid-bg{
+
+    position:fixed;
+
+    inset:0;
+
+    background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+
+    background-size:40px 40px;
+
+    mask-image:
+    radial-gradient(circle at center, black 35%, transparent 100%);
+
+    z-index:-5;
+}
+
+/* GLOW */
+
+body::before{
+
+    content:'';
+
+    position:fixed;
+
+    width:650px;
+    height:650px;
+
+    background:rgba(124,58,237,.22);
+
+    filter:blur(180px);
+
+    top:-250px;
+    left:-250px;
+
+    z-index:-4;
+}
+
+body::after{
+
+    content:'';
+
+    position:fixed;
+
+    width:650px;
+    height:650px;
+
+    background:rgba(6,182,212,.18);
+
+    filter:blur(180px);
+
+    bottom:-250px;
+    right:-250px;
+
+    z-index:-4;
+}
+
+/* NAVBAR */
+
+.navbar{
+
+    position:fixed;
+
+    top:20px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:92%;
+    max-width:1350px;
+
+    padding:18px 34px;
+
+    display:flex;
+
+    justify-content:space-between;
+    align-items:center;
+
+    border-radius:26px;
+
+    background:rgba(255,255,255,.05);
+
+    backdrop-filter:blur(30px);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    z-index:9999;
+}
+
+.logo{
+
+    font-size:28px;
+
+    font-weight:900;
+
+    letter-spacing:-1px;
+
+    background:var(--gradient);
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.menu{
+
+    display:flex;
+
+    gap:35px;
+}
+
+.menu a{
+
+    color:white;
+
+    text-decoration:none;
+
+    font-size:15px;
+
+    transition:.3s;
+}
+
+.menu a:hover{
+
+    color:#67e8f9;
+}
+
+.admin-btn{
+
+    padding:14px 28px;
+
+    border-radius:18px;
+
+    text-decoration:none;
+
+    color:white;
+
+    background:var(--gradient);
+
+    font-weight:600;
+
+    transition:.3s;
+}
+
+.admin-btn:hover{
+
+    transform:translateY(-4px);
+}
+
+/* HERO */
+
+.hero{
+
+    min-height:100vh;
+
+    display:grid;
+
+    grid-template-columns:1.1fr .9fr;
+
+    align-items:center;
+
+    gap:90px;
+
+    padding:180px 8% 120px;
+}
+
+.badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:14px 22px;
+
+    border-radius:999px;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    margin-bottom:35px;
+
+    font-size:14px;
+
+    backdrop-filter:blur(20px);
+}
+
+.dot{
+
+    width:10px;
+    height:10px;
+
+    border-radius:50%;
+
+    background:#22c55e;
+
+    box-shadow:0 0 20px #22c55e;
+}
+
+.hero h1{
+
+    font-size:92px;
+
+    line-height:1;
+
+    margin-bottom:30px;
+
+    font-weight:900;
+
+    letter-spacing:-5px;
+
+    text-shadow:
+    0 0 40px rgba(124,58,237,.25);
+}
+
+.gradient{
+
+    background:var(--gradient);
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.hero p{
+
+    color:var(--muted);
+
+    font-size:18px;
+
+    line-height:2;
+
+    max-width:650px;
+}
+
+.hero-buttons{
+
+    display:flex;
+
+    gap:18px;
+
+    margin-top:45px;
+
+    flex-wrap:wrap;
+}
+
+.btn{
+
+    padding:18px 34px;
+
+    border-radius:20px;
+
+    text-decoration:none;
+
+    color:white;
+
+    background:var(--gradient);
+
+    font-weight:600;
+
+    transition:.4s;
+
+    box-shadow:
+    0 10px 40px rgba(124,58,237,.3);
+}
+
+.btn:hover{
+
+    transform:translateY(-8px);
+}
+
+.btn-outline{
+
+    padding:18px 34px;
+
+    border-radius:20px;
+
+    text-decoration:none;
+
+    color:white;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    background:rgba(255,255,255,.04);
+
+    transition:.4s;
+}
+
+.btn-outline:hover{
+
+    transform:translateY(-8px);
+
+    border-color:#06b6d4;
+}
+
+/* FLOATING */
+
+@keyframes floating{
+
+    0%{
+        transform:translateY(0px);
+    }
+
+    50%{
+        transform:translateY(-14px);
+    }
+
+    100%{
+        transform:translateY(0px);
+    }
+}
+
+.hero-right{
+
+    position:relative;
+
+    display:flex;
+
+    justify-content:center;
+}
+
+.main-image{
+
+    width:450px;
+    height:590px;
+
+    object-fit:cover;
+
+    border-radius:42px;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:
+    0 40px 100px rgba(0,0,0,.55);
+
+    animation:floating 5s ease-in-out infinite;
+}
+
+.float-card{
+
+position:absolute;
+
+width:220px;
+
+padding:18px 22px;
+
+border-radius:24px;
+
+background:rgba(255,255,255,.05);
+
+backdrop-filter:blur(25px);
+
+border:1px solid rgba(255,255,255,.08);
+
+animation:floatCard 5s ease-in-out infinite;
+
+transition:.4s;
+}
+
+.float-card:hover{
+
+transform:scale(1.05);
+}
+
+.float-card h4{
+
+font-size:15px;
+
+margin-bottom:8px;
+}
+
+.float-card p{
+
+font-size:13px;
+
+line-height:1.7;
+
+color:#94a3b8;
+}
+
+@keyframes floatCard{
+
+0%{
+    transform:translateY(0px);
+}
+
+50%{
+    transform:translateY(-10px);
+}
+
+100%{
+    transform:translateY(0px);
+}
+}
+
+/* SECTION */
+
+.section{
+
+    padding:120px 8%;
+}
+
+.section-title{
+
+    text-align:center;
+
+    font-size:64px;
+
+    margin-bottom:20px;
+
+    font-weight:900;
+
+    letter-spacing:-2px;
+}
+
+.section-sub{
+
+    text-align:center;
+
+    max-width:720px;
+
+    margin:auto auto 70px;
+
+    color:#94a3b8;
+
+    line-height:1.9;
+}
+
+/* SKILLS */
+
+.skills-modern{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+    gap:26px;
+}
+
+.skill-card{
+
+    width:300px;
+
+    padding:34px;
+
+    border-radius:32px;
+
+    background:
+    linear-gradient(
+        180deg,
+        rgba(255,255,255,.08),
+        rgba(255,255,255,.03)
+    );
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(24px);
+
+    transition:.45s;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.skill-card::before{
+
+    content:'';
+
+    position:absolute;
+
+    width:180px;
+    height:180px;
+
+    background:rgba(124,58,237,.18);
+
+    filter:blur(80px);
+
+    top:-60px;
+    right:-60px;
+
+    opacity:0;
+
+    transition:.4s;
+}
+
+.skill-card::after{
+
+    content:'';
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+    linear-gradient(
+        135deg,
+        transparent,
+        rgba(255,255,255,.08),
+        transparent
+    );
+
+    transform:translateX(-100%);
+
+    transition:.8s;
+}
+
+.skill-card:hover{
+
+    transform:
+    translateY(-12px)
+    scale(1.02);
+
+    border-color:
+    rgba(6,182,212,.45);
+
+    box-shadow:
+    0 20px 50px rgba(6,182,212,.15);
+}
+
+.skill-card:hover::before{
+
+    opacity:1;
+}
+
+.skill-card:hover::after{
+
+    transform:translateX(100%);
+}
+
+.skill-icon{
+
+    width:72px;
+    height:72px;
+
+    border-radius:24px;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    margin-bottom:24px;
+
+    font-size:30px;
+
+    background:
+    linear-gradient(
+        135deg,
+        rgba(124,58,237,.2),
+        rgba(6,182,212,.2)
+    );
+
+    border:1px solid rgba(255,255,255,.08);
+
+    color:#67e8f9;
+
+    box-shadow:
+    0 0 25px rgba(6,182,212,.18);
+}
+
+.skill-card h3{
+
+    margin-bottom:14px;
+
+    font-size:24px;
+}
+
+.skill-card p{
+
+    color:#94a3b8;
+
+    line-height:1.9;
+
+    font-size:14px;
+}
+
+/* PROJECTS */
+
+.projects{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(340px,1fr));
+
+    gap:30px;
+}
+
+.project{
+
+    border-radius:34px;
+
+    overflow:hidden;
+
+    background:
+    linear-gradient(
+        180deg,
+        rgba(255,255,255,.07),
+        rgba(255,255,255,.03)
+    );
+
+    border:1px solid rgba(255,255,255,.08);
+
+    transition:.45s;
+
+    backdrop-filter:blur(24px);
+}
+
+.project:hover{
+
+    transform:translateY(-10px);
+}
+
+.project img{
+
+    width:100%;
+
+    height:240px;
+
+    object-fit:cover;
+
+    transition:.5s;
+}
+
+.project:hover img{
+
+    transform:scale(1.05);
+}
+
+.project-content{
+
+    padding:28px;
+}
+
+.project-content h3{
+
+    margin-bottom:14px;
+
+    font-size:24px;
+}
+
+.project-content p{
+
+    color:#94a3b8;
+
+    line-height:1.9;
+
+    margin-bottom:20px;
+}
+
+.project-content a{
+
+    color:#67e8f9;
+
+    text-decoration:none;
+
+    font-weight:600;
+}
+
+/* EXPERIENCE */
+
+.timeline{
+
+    max-width:950px;
+
+    margin:auto;
+}
+
+.timeline-item{
+
+    display:flex;
+
+    gap:25px;
+
+    padding:35px;
+
+    border-radius:32px;
+
+    margin-bottom:25px;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(20px);
+
+    transition:.4s;
+}
+
+.timeline-item:hover{
+
+    transform:translateY(-8px);
+}
+
+.timeline-item img{
+
+    width:90px;
+    height:90px;
+
+    object-fit:cover;
+
+    border-radius:24px;
+}
+
+.timeline-item h2{
+
+    margin-bottom:8px;
+}
+
+.timeline-item h4{
+
+    margin-bottom:8px;
+
+    color:#67e8f9;
+}
+
+.timeline-item small{
+
+    color:#94a3b8;
+}
+
+.timeline-item p{
+
+    margin-top:15px;
+
+    line-height:1.9;
+
+    color:#94a3b8;
+}
+
+/* CONTACT */
+
+.contact-box{
+
+    max-width:850px;
+
+    margin:auto;
+
+    padding:55px;
+
+    border-radius:38px;
+
+    background:rgba(255,255,255,.04);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    backdrop-filter:blur(30px);
+}
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:20px;
+}
+
+input,
+textarea{
+
+    width:100%;
+
+    padding:18px;
+
+    border:none;
+
+    border-radius:18px;
+
+    background:#111827;
+
+    color:white;
+
+    margin-bottom:20px;
+
+    border:1px solid transparent;
+
+    transition:.3s;
+}
+
+input:focus,
+textarea:focus{
+
+    outline:none;
+
+    border-color:#06b6d4;
+}
+
+textarea{
+
+    height:180px;
+
+    resize:none;
+}
+
+/* FOOTER */
+
+.footer{
+
+    padding:60px;
+
+    text-align:center;
+
+    color:#94a3b8;
+}
+
+/* REVEAL */
+
+.reveal{
+
+    opacity:0;
+
+    transform:translateY(50px);
+
+    transition:1s;
+}
+
+.reveal.active{
+
+    opacity:1;
+
+    transform:translateY(0);
+}
+
+/* MOBILE */
+
+@media(max-width:1000px){
+
+    .hero{
+
+        grid-template-columns:1fr;
+
+        text-align:center;
+    }
+
+    .hero h1{
+
+        font-size:58px;
+    }
+
+    .hero-buttons{
+
+        justify-content:center;
+    }
+
+    .menu{
+
+        display:none;
+    }
+
+    .main-image{
+
+        width:320px;
+        height:420px;
+    }
+
+    .float-card{
+
+        display:none;
+    }
+
+    .timeline-item{
+
+        flex-direction:column;
+    }
+
+    .form-grid{
+
+        grid-template-columns:1fr;
+    }
+
+    .section-title{
+
+        font-size:42px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="grid-bg"></div>
+
+<header class="navbar">
+
+    <div class="logo">
+        <?= $profile['name']; ?>
+    </div>
+
+    <nav class="menu">
+
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+
+    </nav>
+
+    <a href="login.php"
+    class="admin-btn">
+
+        admin
+
+    </a>
+
+</header>
+
+<section class="hero reveal">
+
+    <div>
+
+        <div class="badge">
+
+            <div class="dot"></div>
+
+            Open To Work & Freelance
+
+        </div>
+
+        <h1>
+        Building experience  
+            <span class="gradient">
+            through
+            </span>
+
+            continuous learning.
+
+        </h1>
+
+        <p>
+
+            <?= $profile['description']; ?>
+
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="#projects"
+            class="btn">
+
+                Explore Projects
+
+            </a>
+
+            <a
+            href="assets/upload/cv/<?= $profile['cv']; ?>"
+            class="btn-outline"
+            download>
+
+                Download CV
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="hero-right">
+
+    <img
+    src="assets/upload/profile/<?= $profile['photo']; ?>"
+    class="main-image">
+
+    <?php
+
+    $positions = [
+
+        "top:20px; left:-40px;",
+        "top:80px; right:-50px;",
+        "bottom:30px; left:-50px;",
+        "bottom:80px; right:-40px;",
+        "top:220px; left:-80px;",
+        "top:250px; right:-90px;",
+        "bottom:180px; left:-90px;",
+        "bottom:220px; right:-80px;"
+    ];
+
+    $i = 0;
+
+    while($c=mysqli_fetch_assoc($heroCards)):
+
+    ?>
+
+        <div
+        class="float-card"
+        style="<?= $positions[$i % count($positions)]; ?>">
+
+            <h4>
+                <?= $c['title']; ?>
+            </h4>
+
+            <p>
+                <?= $c['description']; ?>
+            </p>
+
+        </div>
+
+    <?php
+
+    $i++;
+
+    endwhile;
+
+    ?>
+
+   
+</section>
+
+<section class="section reveal"
+id="skills">
+
+    <h2 class="section-title">
+        Skills & Technologies
+    </h2>
+
+    <p class="section-sub">
+
+        Technologies and tools that I use to build
+        modern and scalable applications.
+
+    </p>
+
+    <div class="skills-modern">
+
+        <?php while($s=mysqli_fetch_assoc($skills)): ?>
+
+        <div class="skill-card">
+
+            <div class="skill-icon">
+
+                <i class="<?= $s['icon']; ?>"></i>
+
+            </div>
+
+            <h3>
+                <?= $s['name']; ?>
+            </h3>
+
+            <p>
+                <?= $s['description']; ?>
+            </p>
+
+        </div>
+
+        <?php endwhile; ?>
+
+    </div>
+
+</section>
+
+<section class="section reveal"
+id="projects">
+
+    <h2 class="section-title">
+        Featured Projects
+    </h2>
+
+    <p class="section-sub">
+
+        Selected projects showcasing technical expertise and creative solutions.
+
+    </p>
+
+    <div class="projects">
+
+        <?php while($p=mysqli_fetch_assoc($projects)): ?>
+
+        <div class="project">
+
+            <img
+            src="assets/upload/project/<?= $p['image']; ?>">
+
+            <div class="project-content">
+
+                <h3>
+                    <?= $p['title']; ?>
+                </h3>
+
+                <p>
+                    <?= substr($p['description'],0,120); ?>...
+                </p>
+
+                <a href="project/detail.php?id=<?= $p['id']; ?>">
+
+                    View Detail →
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <?php endwhile; ?>
+
+    </div>
+
+</section>
+
+<section class="section reveal"
+id="experience">
+
+    <h2 class="section-title">
+        Experience
+    </h2>
+
+    <p class="section-sub">
+
+        Professional journey and technical experiences.
+
+    </p>
+
+    <div class="timeline">
+
+        <?php while($e=mysqli_fetch_assoc($experience)): ?>
+
+        <div class="timeline-item">
+
+            <img
+            src="assets/upload/company/<?= $e['logo']; ?>">
+
+            <div>
+
+                <h2>
+                    <?= $e['company']; ?>
+                </h2>
+
+                <h4>
+                    <?= $e['position']; ?>
+                </h4>
+
+                <small>
+                    <?= $e['period']; ?>
+                </small>
+
+                <p>
+                    <?= $e['description']; ?>
+                </p>
+
+            </div>
+
+        </div>
+
+        <?php endwhile; ?>
+
+    </div>
+
+</section>
+
+<section class="section reveal"
+id="contact">
+
+    <h2 class="section-title">
+        Let's Work Together
+    </h2>
+
+    <p class="section-sub">
+
+        Have a project, collaboration, or opportunity?
+        Feel free to contact me.
+
+    </p>
+
+    <div class="contact-box">
+
+        <form method="POST">
+
+            <div class="form-grid">
+
+                <input
+                type="text"
+                name="name"
+                placeholder="Your Name"
+                required>
+
+                <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                required>
+
+            </div>
+
+            <textarea
+            name="message"
+            placeholder="Write your message..."
+            required></textarea>
+
+            <button
+            class="btn"
+            name="send">
+
+                Send Message
+
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+<footer class="footer">
+
+    © 2026 <?= $profile['name']; ?> — D4 Information System
+
+</footer>
+
+<script>
+
+/* REVEAL */
+
+const reveals =
+document.querySelectorAll('.reveal');
+
+window.addEventListener('scroll', () => {
+
+    reveals.forEach(reveal => {
+
+        const top =
+        reveal.getBoundingClientRect().top;
+
+        if(top < window.innerHeight - 100){
+
+            reveal.classList.add('active');
+        }
+    });
+});
+
+</script>
+
+</body>
+</html>

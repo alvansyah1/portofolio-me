@@ -1,0 +1,19 @@
+.light{
+    --bg:#f8fafc;
+    --surface:rgba(255,255,255,.8);
+    --surface2:rgba(255,255,255,.95);
+    --text:#111827;
+    --muted:#4b5563;
+    --border:rgba(0,0,0,.08);
+}
+
+.theme-btn{
+    width:50px;
+    height:50px;
+    border:none;
+    border-radius:16px;
+    background:var(--surface);
+    color:var(--text);
+    cursor:pointer;
+    font-size:18px;
+}
