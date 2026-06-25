@@ -1758,7 +1758,7 @@ animation-duration:<?= rand(10,18); ?>s;
             <div class="photo-frame">
 
                 <img
-                src="assets/upload/profile/<?= $profile['photo']; ?>">
+                src="https://alvansyah1.github.io/portofolio-me/assets/upload/profile/<?= $profile['photo']; ?>">
 
             </div>
 
